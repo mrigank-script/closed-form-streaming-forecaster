@@ -17,6 +17,9 @@ data/raw/
 # Convenience PNG copies for quick upload — figures/ is the source of truth
 upload/
 
+# Zenodo release archive — not part of the source repo
+normastream-*.zip
+
 # OS noise
 .DS_Store
 Thumbs.db
