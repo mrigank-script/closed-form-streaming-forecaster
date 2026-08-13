@@ -1,9 +1,14 @@
-# Swarm Core — Closed-Form Long-Horizon Time-Series Forecasting
+# NormaStream — Closed-Form Long-Horizon Time-Series Forecasting
 
-A training-free, closed-form forecasting engine for the standard long-horizon
-time-series benchmarks. The core solves ridge regression **exactly in a single
-algebraic step** (no SGD, no learning rate, no weight-seed randomness) and
-updates online in closed form via Woodbury — so the forecast is fully
+NormaStream is a study of whether streaming time-series forecasting can be
+done effectively **without backpropagation or continual gradient-based
+training**. The method initializes the model with closed-form ridge
+regression, then adapts it one observation at a time with Recursive Least
+Squares (RLS) via Woodbury updates. An optional fixed complex-valued LRU
+reservoir — **NormaRC** — provides longer temporal memory.
+
+The core solves ridge regression **exactly in a single algebraic step** (no
+SGD, no learning rate, no weight-seed randomness), so the forecast is fully
 deterministic and the uncertainty you report is the honest test-time sampling
 variability, not optimizer luck.
 
@@ -134,4 +139,6 @@ PYTHONPATH=. python scripts/copy_upload.py   # rebuild upload/ from figures/
 
 ## License
 
-TBD — add your license before publishing.
+MIT — Copyright (c) 2026 Mrigank. You are free to use, modify, and distribute
+this code (including commercially) provided you retain the copyright notice.
+See [LICENSE](LICENSE).
