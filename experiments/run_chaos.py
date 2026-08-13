@@ -1,10 +1,10 @@
-"""experiments/run_chaos.py — Chaos track driver (track #4).
+"""Chaos track driver.
 
 Usage:  ./run.sh experiments.run_chaos [--seeds N]
 
-With --seeds N, each task runs over N random initial conditions / drives and
-reports mean ± std (the honest seed spread for the chaotic tasks, which do
-have genuine randomness in ICs and drives).
+With --seeds N each task runs over N random initial conditions / drives and
+reports mean ± std — the honest seed spread for the chaotic tasks, which do
+have genuine randomness in ICs and drives.
 """
 
 import argparse

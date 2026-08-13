@@ -1,16 +1,15 @@
-"""figuregen/data.py — single source of truth for every figure's numbers.
+"""Single source of truth for every figure's numbers.
 
-Loads the protocol rows, seed/bootstrap rows, published anchors, chaos
-summary and (optional) timing measurements produced elsewhere in the repo,
-normalising them into small dicts/DataFrames that all section modules plot
-from. No figure module should read a JSON file directly.
+Loads the protocol rows, seed/bootstrap rows, published anchors and chaos
+summary produced elsewhere in the repo, normalising them into dicts/DataFrames
+the section modules plot from. No figure module reads a JSON file directly.
 
-Contract files (see docs/paper_context.md §7):
+Contract files (see docs/paper_context.md):
   data/proc/results/<ds>_<H>.json          run_table rows (list of dicts)
-  data/proc/results/<ds>_<H>_seeds.json    run_seeds rows ({..."rows": [...]})
+  data/proc/results/<ds>_<H>_seeds.json    run_seeds rows ({"rows": [...]})
   data/proc/published_dsof.json            DSOF Table-2 anchors
   data/proc/chaos_results.json             chaos summary
-  data/proc/results/timing.json            run_profile output (may not exist yet)
+  data/proc/results/timing.json            optional timing measurements
 """
 
 import json
@@ -24,10 +23,6 @@ RESULTS = os.path.join(PROC, "results")
 VALID_DATASETS = ("etth2", "ettm1", "exchange", "weather", "traffic", "electricity")
 HORIZONS = (1, 24, 48)
 
-
-# ---------------------------------------------------------------------------
-# Result rows
-# ---------------------------------------------------------------------------
 
 def _datasets_with_rows():
     found = set()
@@ -46,9 +41,8 @@ def _datasets_with_rows():
 def load_results(dataset=None, horizons=None):
     """Load run_table rows across datasets/horizons.
 
-    Returns dict {(dataset, H, model): row} and a parallel list metadata of
-    which (dataset,H) files exist. Skips seeds-format and clip rows (handled
-    separately below) unless explicitly asked via `load_rows(include_clip=...)`.
+    Returns {(dataset, H, model): row} plus the list of (dataset,H) files that
+    exist. Skips seeds-format and clip rows (handled separately).
     """
     datasets = [dataset] if dataset else _datasets_with_rows()
     horizons = horizons or HORIZONS
@@ -74,18 +68,15 @@ def load_results(dataset=None, horizons=None):
 def load_seeds(dataset=None, horizons=None, include_clip=False):
     """Load run_seeds bootstrap rows.
 
-    Returns dict {(dataset, H, model, clip): row} where clip is 0.0 or the
-    clip factor. Also returns the list of loaded file paths.
+    Returns {(dataset, H, model, clip): row} plus the loaded file paths.
+    Accepts any <ds>_<H>*_seeds.json in results/; the protocol rows inside
+    carry (dataset, pred_len, model) so the filename suffix is decorative.
     """
     datasets = [dataset] if dataset else _datasets_with_rows()
     horizons = horizons or HORIZONS
     rows = {}
     files = []
     for ds in datasets:
-        # Accept any <ds>_<H>*_seeds.json in results/ (e.g. etth2_24_seeds.json,
-        # ettm1_24_s2_seeds.json, electricity_1_raw_seeds.json) — the protocol
-        # rows inside carry (dataset, pred_len, model) so the filename suffix
-        # is decorative and must not gate what we plot.
         candidates = (f for f in os.listdir(RESULTS)
                       if f.startswith(f"{ds}_") and f.endswith("_seeds.json"))
         for fn in candidates:
@@ -113,8 +104,7 @@ def load_seeds(dataset=None, horizons=None, include_clip=False):
 def load_electricity_rows(include_plain=True):
     """Electricity-H1 rows for all models under raw & clip=3 protocols.
 
-    Returns dict {(kind, model): row} with kind in {"raw", "clip3",
-    "raw_s2", "clip3_s2"} matching the verified fp64 determinism re-run.
+    Returns {(kind, model): row} with kind in {"raw", "clip3", "plain"}.
     """
     raw = {}
     for fn, kind in (("electricity_1_raw64.json", "raw"),
@@ -129,9 +119,7 @@ def load_electricity_rows(include_plain=True):
     return raw
 
 
-# ---------------------------------------------------------------------------
 # Published anchors
-# ---------------------------------------------------------------------------
 
 def load_published():
     with open(os.path.join(PROC, "published_dsof.json")) as fh:
@@ -139,10 +127,8 @@ def load_published():
 
 
 def published_cells(dataset, H, publisher=None):
-    """List of (teacher, mode, mse) for the 14 published cells at (ds,H).
-
-    mode in {"batch","dsof"}. If `publisher` given, returns just its rows.
-    """
+    """(teacher, mode, mse) for all published cells at (ds,H); mode in
+    {"batch","dsof"}. With `publisher`, only that teacher's rows."""
     pub = load_published()["rows"]
     d = pub.get(dataset)
     if not d:
@@ -159,30 +145,19 @@ def published_cells(dataset, H, publisher=None):
     return out
 
 
-# ---------------------------------------------------------------------------
-# Chaos
-# ---------------------------------------------------------------------------
-
 def load_chaos():
     with open(os.path.join(PROC, "chaos_results.json")) as fh:
         return json.load(fh)
 
 
-# ---------------------------------------------------------------------------
-# Timing (optional; produced by experiments/run_profile.py)
-# ---------------------------------------------------------------------------
-
 def load_timing():
+    """Optional timing measurements (experiments/run_profile-style output)."""
     p = os.path.join(RESULTS, "timing.json")
     if os.path.exists(p):
         with open(p) as fh:
             return json.load(fh)
     return None
 
-
-# ---------------------------------------------------------------------------
-# Utilities
-# ---------------------------------------------------------------------------
 
 def row_value(rows, dataset, H, model, field="mse"):
     r = rows.get((dataset, H, model))
@@ -199,7 +174,7 @@ def by_step_series(rows, dataset, H, model):
 
 
 def ours_best(rows, dataset, H, models=("static", "rls", "s2rls")):
-    """Best (min MSE) of our models at (ds,H) that pass the rank bar."""
+    """Best (min MSE) of our models at (ds,H)."""
     best = None
     for m in models:
         v = row_value(rows, dataset, H, m)
@@ -211,7 +186,7 @@ def ours_best(rows, dataset, H, models=("static", "rls", "s2rls")):
 
 
 def beats_count(rows, dataset, H):
-    """(#cells beaten, #cells tied, total) for our best row at (ds,H)."""
+    """(#cells beaten, #cells tied, #cells total) for our best row at (ds,H)."""
     best = ours_best(rows, dataset, H)
     if best is None:
         return None

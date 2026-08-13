@@ -1,20 +1,13 @@
-"""experiments/forecaster.py — closed-form streaming forecaster (S0/S1).
+"""Closed-form streaming forecaster (S0/S1).
 
-Pipeline (exactly protocol-safe, no information leakage):
-  1. warmup:  per-channel ridge fit on the TRAIN segment via core solver math
-              (information_alignment.ia_regularise + pos-Cholesky solve).
-  2. online:   at each live time t, first fold the now-observed target pair
-              (phi[t-h], X[t]) into a vectorised Woodbury RLS state (O(D^2)),
-              then emit the h-step-ahead forecast phi[t] @ W  ->  X[t+h].
+1. warmup: per-channel ridge fit on the train segment via the core solver
+   (information_alignment.ia_regularise + symmetric-Cholesky solve).
+2. online: at each live time t, fold the now-observed target pair
+   (phi[t-h], X[t]) into a vectorised Woodbury RLS state (O(D^2)), then emit
+   the h-step-ahead forecast phi[t] @ W -> X[t+h].
 
 Both stages run on GPU; the online stage is a single lax.scan over (S, D)
-states using the chunked pattern validated in gpu_smoke (never materialises
-the full (T, S, D) input on GPU).
-
-The head is deliberately per-channel: statistical streamers / ARIMA / the
-Microprediction paradigm all predict channels independently, and block-diagonal
-ridge is exactly this decomposition. Cross-channel coupling (LRU / Hopfield,
-Phase 2) is layered on top of this head later.
+states, chunked so the full (T, S, D) input never materialises on GPU.
 """
 
 import numpy as np
@@ -28,12 +21,10 @@ from core import information_alignment as ia
 
 def ridge_warmup(Phi: jnp.ndarray, y: jnp.ndarray,
                  lam: float = 1e-3, gamma: float = 0.0, bs: int = 64):
-    """Per-channel ridge fit.
+    """Per-channel ridge fit: Phi (T, S, F), y (T, S) -> W (S, F), A_inv (S, F, F).
 
-    Phi: (T, S, F). y: (T, S). Returns W (S, F) and A_inv (S, F, F).
-    A_IA = Phi^T Phi / M + (gamma+lam) I ;  B   = Phi^T y / M
-    Uses core.ia_regularise (gamma=0 recovers plain ridge; the machinery is
-    shared with the full IA solver).
+    A_IA = Phi^T Phi / M + (gamma+lam) I ; B = Phi^T y / M, via core.ia_regularise
+    (gamma=0 recovers plain ridge; the machinery is shared with the full solver).
     """
     T = Phi.shape[0]
     y2 = jnp.where(jnp.isnan(y), 0.0, y)
@@ -76,12 +67,9 @@ def _online_step(carry, xs):
 def run_online(Phi_prev, y_obs, Phi_now, W0, A_inv0, chunk: int = 1024):
     """Vectorised RLS online forecasting.
 
-    Args:
-      Phi_prev: (L, S, F)  phi[t-h]  (observed inputs)
-      y_obs:    (L, S)     X[t]      (observed targets)
-      Phi_now:  (L, S, F)  phi[t]    (current inputs -> forecasts)
-    Returns:
-      preds: (L, S)  the h-step forecasts phi[t] @ W_after_update
+    Phi_prev (L, S, F) = phi[t-h] observed inputs; y_obs (L, S) = X[t] targets;
+    Phi_now (L, S, F) = phi[t] -> returns the h-step forecasts
+    phi[t] @ W_after_update, scored in chunks.
     """
     state = (A_inv0, W0)
 
@@ -99,10 +87,7 @@ def run_online(Phi_prev, y_obs, Phi_now, W0, A_inv0, chunk: int = 1024):
 
 
 def pad_features(F: np.ndarray, bs: int = 64):
-    """Pad the feature dim to the next multiple of `bs` (block-diagonal fit).
-
-    Returns padded (T, S, Fp) float32 and the original F count.
-    """
+    """Pad the feature dim up to a multiple of bs (for block-diagonal fitting)."""
     T, S, F = F.shape
     Fp = -(-F // bs) * bs
     if Fp == F:

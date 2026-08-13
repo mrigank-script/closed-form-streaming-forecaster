@@ -1,11 +1,10 @@
-"""experiments/run_seeds.py — seed-spread / variability for our protocol rows.
+"""Block-bootstrap variability for our protocol rows.
 
-Our closed-form head is deterministic (no weight-init randomness), so the
-honest equivalent of the published 5-seed averages is sampling variability
-over test chunks: the online sweep emits a few hundred roughly-iid error
-blocks per (dataset, H, model). We report the classic block-bootstrap
-distribution of the aggregate MSE/MAE (and a jackknife SE), which is what a
-reviewer can compare against the published std rows (DSOF App. E.1).
+The closed-form head is deterministic (no weight-init randomness), so the
+honest equivalent of published 5-seed averages is sampling variability over
+test chunks: the online sweep emits roughly-iid error blocks per (dataset, H,
+model). We report the block-bootstrap distribution of aggregate MSE/MAE (and
+a jackknife-style SE) — what a reviewer can compare against published std rows.
 
 Usage:  ./run.sh experiments.run_seeds --dataset weather --pred_len 24
                                       --models rls --nboot 200
@@ -24,9 +23,9 @@ from experiments.eval_protocol import evaluate
 def block_bootstrap(ce, nboot=200, seed=0, block=1):
     """Block-bootstrap MSE/MAE from per-chunk (sq, ab, n) tuples.
 
-    With block=1 this resamples single chunks; block>1 resamples contiguous
-    runs of chunks (dependent-data safe). Returns dict with mean, se, and
-    5/95 percentiles of the bootstrap distribution.
+    block=1 resamples single chunks; block>1 resamples contiguous runs
+    (dependent-data safe). Returns mean, se, and 5/95 percentiles of the
+    bootstrap distribution.
     """
     rng = np.random.default_rng(seed)
     sq = np.array([c[0] for c in ce])

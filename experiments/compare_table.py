@@ -1,8 +1,8 @@
-"""experiments/compare_table.py — render our protocol rows against published DSOF Table 2.
+"""Compare our protocol rows against published DSOF Table 2 cells.
 
-Reads our rows from data/proc/results/<dataset>_<H>.json (produced by run_table --out)
+Reads our rows from data/proc/results/<dataset>_<H>.json (run_table --out)
 and the published anchors from data/proc/published_dsof.json, then prints a
-ranking table: which published teacher rows we beat/tie/lose to, per dataset & H.
+per-cell ranking: which published teacher rows we beat/tie/lose to.
 
 Usage:  ./run.sh experiments.compare_table
 """

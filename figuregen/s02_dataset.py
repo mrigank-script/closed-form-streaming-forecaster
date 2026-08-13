@@ -1,8 +1,8 @@
-"""figuregen/s02_dataset.py — dataset descriptive figures.
+"""Dataset descriptive figures.
 
 Raw-series montages, train/val/test split timelines, cadence periodograms and
 the ECL spike-channel (114/146) train-vs-test range conflict that drives the
-Electricity case study. Panels within a PNG are correlated (same dataset).
+Electricity case study.
 
 Output: figures/02_dataset/<name>.png
 """

@@ -1,9 +1,9 @@
-"""figuregen/s04_electricity.py — Electricity case-study figures.
+"""Electricity case-study figures.
 
-The value centre of the paper: raw vs corrected protocol, spike persistence
-floor, MSE energy concentration in the two broken meters, and the s2rls
-damping effect. Kept strictly separate from the leaderboard (corrected rows
-are NOT rank-valid — see docs/paper_context.md §3.4).
+Raw vs corrected protocol, spike persistence floor, MSE energy concentration
+in the two broken meters, and the s2rls damping effect. Kept strictly
+separate from the leaderboard (corrected rows are not rank-valid — see
+docs/paper_context.md).
 
 Output: figures/04_electricity/<name>.png
 """

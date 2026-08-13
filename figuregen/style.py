@@ -1,10 +1,7 @@
-"""figuregen/style.py — global A1-grade publication style.
+"""Shared figure style: rcParams, colour palette and model colours.
 
-Single source of truth for the paper figure suite. Every plot in figures/
-derives its MPL rcParams, colourmap and palette from here so the whole paper
-reads as one cohesive, top-tier visual system (Nature / NeurIPS / DeepMind aesthetic):
-Clean serif/sans typography, Okabe-Ito & modern scientific color palettes, high DPI,
-crisp container cards, elegant badges, and structured layout styling.
+Single source of truth for the figure suite; every section module derives
+its MPL rcParams, colours and palette from here.
 """
 
 import os
@@ -12,7 +9,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Refined A1 Publication Palette (Scientific, contrast-rich, colorblind-safe)
+# Palette: scientific, contrast-rich, colorblind-safe
 PALETTE = {
     "ink":          "#0F172A",   # Deep slate / near-black text
     "ink_light":    "#334155",   # Body text / secondary labels
@@ -22,8 +19,8 @@ PALETTE = {
     "card_bg":      "#FFFFFF",   # Inner card fill
     "border":       "#CBD5E1",   # Default border stroke
     "border_dark":  "#94A3B8",   # Emphasized border stroke
-    
-    # Category Accents (Distinct, vibrant, colorblind-safe)
+
+    # Category accents
     "blue":         "#0284C7",   # Data / Input (Sky Blue)
     "blue_light":   "#E0F2FE",
     "blue_border":  "#38BDF8",

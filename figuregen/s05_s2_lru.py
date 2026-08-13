@@ -1,8 +1,8 @@
-"""figuregen/s05_s2_lru.py — S2 (LRU context) analysis figures.
+"""S2 (LRU context) analysis figures.
 
-Shows where the LRU reservoir sits in the feature space, its eigenvalue
-spectrum, memory decay timescales, and the honest clean-data result: S2RLS
-matches RLS within block-bootstrap noise on ETTm1-H24, and damps Electricity.
+Eigenvalue spectrum, memory decay timescales, and the honest clean-data
+result: S2RLS matches RLS within block-bootstrap noise on ETTm1-H24, and
+damps Electricity.
 
 Output: figures/05_s2_lru/<name>.png
 """

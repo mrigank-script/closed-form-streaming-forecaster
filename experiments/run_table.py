@@ -1,11 +1,10 @@
-"""experiments/run_table.py — reproduce official-protocol rows for a dataset.
+"""Reproduce official-protocol rows for a dataset.
 
 Usage:  ./run.sh experiments.run_table --dataset etth1 --pred_len 24
                                        --models static rls --seq_len 96
 
-Protocol: DSOF (ICLR 2025) / OneNet (NeurIPS 2023) — DLinear-class static,
-and online RLS (S1) scored with cumulative MSE/MAE over the test segment,
-comparable to DSOF Table 2.
+Scores static / online-RLS rows with cumulative MSE/MAE over the test segment
+under the DSOF-comparable no-leakage protocol.
 """
 
 import argparse

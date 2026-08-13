@@ -1,10 +1,7 @@
-"""figuregen/render_all.py — regenerate every figure section + manifest.
+"""Regenerate every figure section, then rebuild the manifest.
 
 Run from repo root:
   PYTHONPATH=. python figuregen/render_all.py
-Sections that need heavy compute (s02 dataset montages) load raw files but are
-fast; s06 re-integrates chaos trajectories; s07 reads timing.json (already
-produced). manifest.json is rebuilt at the end with the panel totals.
 """
 
 import importlib

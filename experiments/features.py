@@ -1,15 +1,10 @@
-"""experiments/features.py — per-channel sliding-window feature building.
+"""Per-channel sliding-window feature building.
 
-For each series independently at each time t we build a small feature vector
-(linear + stats + spectral + circadian), so the closed-form head is a small
-per-channel ridge/RLS model — the classic streaming-forecasting decomposition
-(Microprediction, statistical streamers) and the natural fit for the core
-solver's block-diagonal head.
-
-Cadences (periodicity for sine/cosine time-of-day features):
-  electricity: hourly   (24)   traffic: hourly   (24)
-  exchange:    daily    (7)    etth1/2: hourly   (24)
-  ettm1:       15-min   (96)   weather: 10-min   (144)
+For each series independently we build a small feature vector (linear lags +
+window stats + FFT shape + time-of-day), so the closed-form head is a small
+per-channel ridge/RLS model. Cadences: electricity/traffic hourly (24),
+exchange daily (7), etth1/2 hourly (24), ettm1 15-min (96), weather 10-min
+(144).
 """
 
 from functools import lru_cache
@@ -106,21 +101,15 @@ def _feature_columns(x, todv, lookback: int, bins: int = FFT_BINS):
 
 
 def build_features(X_all: np.ndarray, tod: int, lookback: int = DEFAULT_LOOKBACK):
-    """Build per-channel feature matrix for a dataset.
+    """Build the per-channel feature matrix for a dataset.
 
-    Args:
-        X_all: (T, S) float array (series as columns).
-        tod:   cadence period for time-of-day features.
-
-    Returns:
-        F: (T, S, F) float64 feature matrix (start rows NaN-flagged where
-           the lookback window is incomplete).
-        colnames: list[str]
+    X_all: (T, S) series. Returns (T, S, F) float64 features (start rows
+    NaN-flagged where the lookback window is incomplete) and column names.
     """
     T, S = X_all.shape
     F_all = 6 + lookback + eff_bins(lookback) + 2
     F = np.full((T, S, F_all), np.nan, dtype=np.float64)
-    todv = day_phase_tri(tod, T)                    # (T, 2) -- extra rows -> slice
+    todv = day_phase_tri(tod, T)                    # (T, 2)
 
     for s in range(S):
         F[:, s, :] = _feature_columns(X_all[:, s], todv, lookback)
@@ -134,20 +123,11 @@ def build_features(X_all: np.ndarray, tod: int, lookback: int = DEFAULT_LOOKBACK
 
 def features_slice(X_all: np.ndarray, tod: int, t0: int, n: int,
                    lookback: int = DEFAULT_LOOKBACK):
-    """Causal feature stream rows [t0, t0+n) for a dataset.
+    """Causal feature rows [t0, t0+n) without materialising the full tensor.
 
-    Matches build_features exactly on the same rows, but computes only the
-    minimal contiguous slice [t0-lookback+1, t0+n) so the full (T, S, F)
-    tensor never materialises (required for Traffic: 17544 x 862 x 112).
-
-    Args:
-        X_all: (T, S) float array.
-        tod:   cadence period.
-        t0, n: build features for global rows t0 .. t0+n-1.
-        lookback: window length.
-
-    Returns:
-        F: (n, S, F_all) float64 -- row r corresponds to global t0 + r.
+    Matches build_features exactly on the same rows but only builds the
+    minimal contiguous slice (required for Traffic: 17544 x 862 x 112).
+    Returns (n, S, F_all); row r corresponds to global t0 + r.
     """
     L = lookback
     T, S = X_all.shape
@@ -191,24 +171,17 @@ def causal_fill(X, y=None):
     return Xn
 
 
-# ---------------------------------------------------------------------------
 # S2: LRU reservoir-context features
-# ---------------------------------------------------------------------------
 
 def lru_context(X: np.ndarray, n_modes: int = 8, seed: int = 0,
                 r_min: float = 0.5, r_max: float = 0.995) -> np.ndarray:
     """Fixed random LRU context (S2), causal per series, (T, S, 2*n_modes).
 
     Drives a bank of damped complex oscillators (the LRU diagonal) with the
-    standardized series, then appends the real and imaginary parts of the
-    hidden state as context features. The map is FIXED (no training): the
-    closed-form ridge readout learns the mixing, exactly the next-gen-
-    reservoir decomposition — this is what gives the head long-memory
-    context beyond the 96-lag window.
-
-    Causality: h_t = Λ h_{t-1} + B x_t uses only x_0..x_t, so states are
-    leakage-free. Precompute once per dataset, then slice rows to match
-    features_slice.
+    standardized series and appends real/imaginary parts of the hidden state
+    as context features. The map is FIXED (no training): the ridge readout
+    learns the mixing, giving the head long-memory context beyond the
+    96-lag window. Causality: h_t = Λ h_{t-1} + B x_t sees only x_0..x_t.
     """
     T, S = X.shape
     D = n_modes

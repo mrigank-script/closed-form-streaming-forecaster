@@ -1,8 +1,7 @@
-"""
-Algebraic-identity tests for the core solver, verified on the active JAX device.
+"""Algebraic-identity tests for the core solver.
 
-Each test cross-checks a core module against an independent (dense NumPy / manual)
-reference implementation. All of these must hold on CPU and GPU (float32 tolerance).
+Each test cross-checks a core module against an independent (dense NumPy /
+manual) reference, valid on CPU and GPU (float32 tolerance).
 
 Run:  python -m pytest tests/ -x -q
 """

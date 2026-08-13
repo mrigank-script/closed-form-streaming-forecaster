@@ -1,14 +1,14 @@
-"""figuregen/s03_leaderboard.py — ours vs published DSOF Table-2 cells.
+"""Ours vs published DSOF Table-2 cells.
 
 For every rank-valid (dataset, H) we render correlated panels:
-  * grouped bars      : ours (static/rls/s2/s2rls) vs 14 published cells
-  * histogram         : distribution of the 14 published values, our best marked
-  * scatter/bubble    : teacher x {batch vs dsof}, ours as star
-  * relative improve  : heatmap of (pub - ours)/pub per cell
-  * horizon curve     : per-step MSE (and MAE) from by_step (H24/H48)
-  * bootstrap SE      : block-bootstrap bars with p5/p95 whiskers
+  * grouped bars   : ours (static/rls/s2/s2rls) vs the 14 published cells
+  * histogram      : distribution of the published values, our best marked
+  * scatter/bubble : teacher x {batch vs dsof}, ours as star
+  * heatmap        : relative improvement (pub - ours)/pub per cell
+  * horizon curve  : per-step MSE/MAE from by_step (H24/H48)
+  * bootstrap SE   : block-bootstrap bars with p5/p95 whiskers
 
-Electricity is intentionally EXCLUDED here (corrected row lives in 04).
+Electricity is intentionally excluded here (corrected row lives in 04).
 Output: figures/03_leaderboard/<ds>_H<H>_<kind>.png
 """
 

@@ -1,19 +1,13 @@
-"""experiments/chaos.py — Paper 2 physics arm (track #4).
+"""Chaotic benchmark suite run through the same closed-form core solver as
+the streaming tables — ridge warmup + online prediction, no SGD anywhere.
 
-Chaotic benchmark suite run through the SAME closed-form core solver that
-drives the streaming tables (Paper 2's "whole stack as a repeatable tool"
-thesis): ridge warmup + online prediction, no SGD anywhere.
-
-Tasks
------
-1. Lorenz96 (N=5, F=8, dt=0.02) — next-generation-reservoir benchmark:
-   delay-embed + quadratic monomial features, closed-form ridge for
-   one-step-ahead; multi-step free-run evaluated out to the N-Lyapunov
-   horizon (NG-RC reference: one-step NMSE ~1e-4, free run ~1-2 Lyapunov
-   times, NARMA10 NMSE < 0.0391 line from the Swarm plan).
+Tasks:
+1. Lorenz96 (N=5, F=8, dt=0.02) — delay-embed + quadratic monomial features
+   closed-form ridge for one-step-ahead; multi-step free-run evaluated out to
+   the N-Lyapunov horizon.
 2. NARMA10 / NARMA30 echo-state tasks with the same feature stack.
 3. Lyapunov spectrum of the Lorenz96 flow via QR variational equations
-   (used to express the horizon in units of the largest exponent lambda1).
+   (so the horizon is expressed in units of the largest exponent λ1).
 
 Run:  ./run.sh experiments.run_chaos
 """
@@ -25,17 +19,11 @@ from jax import lax
 
 jax.config.update("jax_enable_x64", True)
 
-from experiments import features as F  # nin-twod / helpers reused for cadence colnames
-from core.ridge_solver import block_ridge_solve  # closed-form head demonstration
 
-
-# ---------------------------------------------------------------------------
-# Integrators (GPU-ready via lax.scan)
-# ---------------------------------------------------------------------------
+# Integrators (lax.scan so they run on GPU)
 
 def lorenz96_vector(x, F=8.0):
-    """Lorenz96 vector field on the ring. x: (N,)
-    dx_i = (x_{i+1} - x_{i-2}) x_{i-1} - x_i + F"""
+    """Lorenz96 vector field on the ring: dx_i = (x_{i+1} - x_{i-2}) x_{i-1} - x_i + F."""
     xp1 = jnp.roll(x, -1)     # x_{i+1}
     xm2 = jnp.roll(x, 2)      # x_{i-2}
     xm1 = jnp.roll(x, 1)      # x_{i-1}
@@ -87,9 +75,7 @@ def narma(n_tau, x_input):
     return y
 
 
-# ---------------------------------------------------------------------------
-# Reservoir / feature construction (NG-RC parity)
-# ---------------------------------------------------------------------------
+# Reservoir / feature construction
 
 def delay_embed_signals(u, memory_order=4, lag=1):
     """Delay-embed a multivariate signal.
@@ -129,16 +115,11 @@ def train_test_split_blocks(u, y, n_train, gap=100):
     return tr, te
 
 
-# ---------------------------------------------------------------------------
 # Closed-form ridge trainer (core solver on reservoir features)
-# ---------------------------------------------------------------------------
 
 def ridge_predict(X_tr, Y_tr, X_te, lam=1e-6):
-    """Closed-form ridge (our core solver, per-output independent).
-
-    Returns Y_hat (T_te, outputs). Assumes X already has bias column or
-    caller centers. Uses scale-invariant lam*trace regularization.
-    """
+    """Closed-form ridge (per-output independent), scale-invariant lam*trace
+    regularisation. Assumes X already has a bias column or the caller centers."""
     Xtr = jnp.asarray(X_tr, dtype=jnp.float64)
     Ytr = jnp.asarray(Y_tr, dtype=jnp.float64)
     Xte = jnp.asarray(X_te, dtype=jnp.float64)
@@ -150,9 +131,7 @@ def ridge_predict(X_tr, Y_tr, X_te, lam=1e-6):
     return np.asarray(Xte @ W)
 
 
-# ---------------------------------------------------------------------------
-# Lyapunov spectrum (QR method)
-# ---------------------------------------------------------------------------
+# Lyapunov spectrum (QR of the variational tangent map)
 
 def lyapunov_lorenz96(x0, F=8.0, dt=0.02, n_trans=1000, n_steps=20000, n=5):
     """Largest Lyapunov exponent via QR of the variational tangent map."""
@@ -179,9 +158,7 @@ def lyapunov_lorenz96(x0, F=8.0, dt=0.02, n_trans=1000, n_steps=20000, n=5):
     return float(run(x, Q))
 
 
-# ---------------------------------------------------------------------------
 # Benchmarks
-# ---------------------------------------------------------------------------
 
 def nmse(y, y_hat):
     mse = np.mean((y - y_hat) ** 2)

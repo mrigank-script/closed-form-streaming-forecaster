@@ -1,27 +1,14 @@
-"""experiments/eval_protocol.py — official-benchmark evaluation harness.
+"""Official-benchmark evaluation harness.
 
-Implements the exact protocol of the accepted online time-series forecasting
-benchmarks (OneNet, NeurIPS 2023 / DSOF, ICLR 2025, "without information
-leakage"), metrically comparable to DSOF Table 2:
+Implements the no-information-leakage protocol of the online forecasting
+literature (OneNet / DSOF): DSOF-parity splits (20/5/75, classic ETT borders),
+per-series normalization fit on the train segment only, and cumulative
+MSE/MAE over every (origin, step) in the test segment. Features stream in
+chunks so Traffic never materialises a (T, S, F) tensor.
 
-  * data  : DSOF-parity raw files, per-series StandardScaler fit on the 20%
-            training segment only (get_protocol_dataset in data.py);
-  * split : DSOF/FSNet loader borders — 20/5/75 fractions for
-            electricity/exchange/traffic/weather, classic ETT borders for
-            etth1/etth2/ettm1 with seq_len offset;
-  * metric: cumulative MSE/MAE aggregated over EVERY (origin t, step r) in
-            the test segment; origin t sees only data <= t (no leakage,
-            predictions are for t+1..t+pred_len) and is never re-scored on
-            records it was updated with;
-  * scale : features stream in chunks via features.features_slice so Traffic
-            (17544 x 862) never materialises a (T, S, F) tensor.
-
-Models (each scored under the identical protocol):
-  static : closed-form per-step ridge (multi-output), a DLinear-class batch
-           model -> reproduces Batch-Learn DLinear rows in DSOF Table 2
-           (protocol-parity check).
-  rls    : per-step online RLS head per r (S1): ridge warmup on train, then
-           update-on-now-observed-target -> predict-future per origin.
+Models: static (closed-form per-step ridge, a DLinear-class batch row) and
+rls (per-step online RLS head per r: ridge warmup on train, then
+update-on-now-observed-target -> predict-future).
 """
 
 import numpy as np
@@ -34,20 +21,18 @@ jax.config.update("jax_enable_x64", True)  # fp64 only for the tiny per-channel 
 from experiments import features as F
 
 
-# ---------------------------------------------------------------------------
 # GPU accumulation / scan primitives
-# ---------------------------------------------------------------------------
 
 @jax.jit
 def _acc_train_cov(phi, y, A, B):
-    """A += sum phi^T phi ;  B += sum phi^T y   (phi (n,S,F), y (n,S))."""
+    """Accumulate A += sum phi^T phi and B += sum phi^T y over the chunk."""
     A = A + jnp.einsum("nsf,nsg->sfg", phi, phi)
     B = B + jnp.einsum("nsf,ns->sf", phi, y)
     return A, B
 
 
 def _online_chunk(carry, xs):
-    """One online step for ALL S series (batched RLS), the S1 head."""
+    """One online step for all series at once (batched RLS, the S1 head)."""
     A_inv, W = carry                                   # (S,F,F),(S,F)
     phi_update, y_obs, phi_pred = xs                   # (S,F),(S,),(S,F)
     v = jnp.einsum("sfa,sa->sf", A_inv, phi_update)
@@ -60,26 +45,17 @@ def _online_chunk(carry, xs):
     return (A_inv, W), pred
 
 
-# ---------------------------------------------------------------------------
 # Train-phase closed-form solve
-# ---------------------------------------------------------------------------
 
 def _static_head(X, tod, tr_end, r, seq_len, lam, chunk_t, H_lru=None):
     """Per-channel ridge weights for step r: phi(t) -> x[t+r].
 
-    Train set = origins t with t in [seq_len-1, tr_end-r) where the target
-    x[t+r] is still inside the train segment. Returns (W, A_inv) both (S,F)
-    and (S,F,F).
-
-    `lam` is the RELATIVE ridge factor: the effective regulariser is
-    lam * trace(A)/F per channel, so closed-form weights stay bounded even
-    when the Gram has near-null directions (the 96 correlated lags). This is
-    the standardised-ridge form; GD-trained DLinear never blows up in null
-    directions because it starts at zero, the closed-form solve must be
-    regularised scale-invariantly.
-
-    H_lru: optional (T, S, F_lru) LRU context (S2) appended to the ridge
-    features before the Gram accumulation.
+    Train set = origins t in [seq_len-1, tr_end-r), i.e. targets still inside
+    the train segment. `lam` is a RELATIVE ridge: the effective regulariser is
+    lam * trace(A)/F per channel, so closed-form weights stay bounded along
+    near-null directions of the Gram (96 correlated lags) instead of blowing
+    up like an unregularised solve. H_lru optionally appends the S2 LRU
+    context to the features.
     """
     S = X.shape[1]
     F_base = 6 + seq_len + F.eff_bins(seq_len) + 2
@@ -108,9 +84,7 @@ def _static_head(X, tod, tr_end, r, seq_len, lam, chunk_t, H_lru=None):
     return W, A_inv
 
 
-# ---------------------------------------------------------------------------
 # Full protocol
-# ---------------------------------------------------------------------------
 
 def evaluate(ds, pred_len: int, model: str = "static",
              lam: float = 1e-3, seq_len: int = 96,
@@ -118,17 +92,15 @@ def evaluate(ds, pred_len: int, model: str = "static",
              return_by_step: bool = True,
              return_chunk_errs: bool = False,
              n_lru_modes: int = 0, lru_seed: int = 0) -> dict:
-    """Run the official protocol for (dataset, pred_len, model).
+    """Run the protocol for (dataset, pred_len, model).
 
     model: "static" | "rls" | "s2" (static + LRU context) | "s2rls".
-    n_lru_modes>0 appends the fixed random LRU context (S2) to the features.
 
-    If `return_chunk_errs`, the returned dict also carries `chunk_errs` —
-    the per-chunk (sq_sum, ab_sum, n) tuples from the online sweep. These
-    give a few hundred roughly-iid error blocks per (dataset,H,model), which
-    is the honest seed-alternative for a deterministic closed-form head:
-    block-bootstrap/jackknife over chunks quantifies sampling variability
-    with no retraining randomness to average over.
+    With return_chunk_errs the dict also carries `chunk_errs` — a few hundred
+    roughly-iid error blocks from the online sweep. For a deterministic
+    closed-form head there is no weight-init randomness to average over, so
+    block-bootstrap/jackknife over these chunks is the honest measure of
+    sampling variability.
     """
     name, X = ds["name"], ds["X"]
     X = np.asarray(X, dtype=np.float64)

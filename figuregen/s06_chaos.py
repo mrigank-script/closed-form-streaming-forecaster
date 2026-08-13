@@ -1,10 +1,9 @@
-"""figuregen/s06_chaos.py — chaos track figures.
+"""Chaos track figures.
 
-Reproduces a Lorenz96 run through the closed-form core to plot
-true-vs-prediction traces, the free-run error growth in Lyapunov times (with
-the λ1 annotation), the step-NMSE across seeds, and NARMA10/30 reconstructions
-vs the <0.0391 parity line. Uses only curves recomputed from experiments.chaos
-so figures stay honest with the JSON summary in data/proc/chaos_results.json.
+Reproduces a Lorenz96 run through the closed-form core: true-vs-prediction
+traces, free-run error growth in Lyapunov times (with the λ1 annotation),
+step-NMSE across seeds, and NARMA10/30 reconstructions. Only curves recomputed
+from experiments.chaos, consistent with data/proc/chaos_results.json.
 
 Output: figures/06_chaos/<name>.png
 """

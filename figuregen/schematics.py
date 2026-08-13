@@ -1,12 +1,8 @@
-"""figuregen/schematics.py — publication-grade diagram primitives.
+"""Diagram primitives for the schematic figures.
 
-Implements clean duo-tone color theory, strict mapping conventions, bus connectors,
-and modern paper typography:
-- Duo-color scheme: Slate/Grayscale for standard elements + Single Amber Accent for proposed solver
-- Custom color overrides for white-fill / black-stroke nodes
-- Rectangles = operations/solvers; Rounded capsules = data/tensors
-- Left-to-right flow with zero crossing arrows
-- Bus connectors for clean tree-like feature aggregation (no arrow chaos)
+Duo-tone palette (slate/grayscale + a single amber accent for the proposed
+solver), node/arrow/container primitives and a fork-and-join bus manifold.
+Rectangles = operations/solvers; rounded capsules = data/tensors.
 """
 
 import matplotlib.pyplot as plt
@@ -15,7 +11,7 @@ from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
 from figuregen.style import save_fig
 
-# Duo-Tone Color Palette
+# Duo-tone colour scheme
 COLOR_NEUTRAL_BG = "#F8FAFC"
 COLOR_NEUTRAL_STROKE = "#64748B"
 COLOR_NEUTRAL_TEXT = "#0F172A"
@@ -34,12 +30,8 @@ COLOR_BLACK_STROKE = "#0F172A"
 def draw_node(ax, x, y, w, h, title, sub=None, shape="rect", accent=False,
               fill_override=None, stroke_override=None, text_override=None,
               title_size=8.5, sub_size=7.2):
-    """Draw a diagram node adhering to strict mapping conventions:
-    - shape='rect': Operation / module / solver
-    - shape='rounded': Data representation / tensor / vector
-    - accent=True: Single accent color reserved for the proposed solver contribution
-    - fill_override / stroke_override: Optional explicit color overrides (e.g. white fill, black stroke)
-    """
+    """Draw a diagram node: rect = operation, rounded = data, accent = solver.
+    fill/stroke/text overrides force explicit colours (e.g. white fill, black stroke)."""
     if fill_override:
         fill_color = fill_override
         stroke_color = stroke_override if stroke_override else COLOR_BLACK_STROKE
@@ -112,7 +104,7 @@ def draw_bus_manifold(ax, x_in, y_in, x_out, y_nodes, accent=False):
     # Output Bus line -> Output
     ax.plot([x_bus_out, x_bus_out], [y_min, y_max], color=color, lw=1.0, zorder=2)
     ax.plot([x_bus_out, x_out], [y_in, y_in], color=color, lw=1.0, zorder=2)
-    
+
     # Arrow to final output
     a = FancyArrowPatch((x_bus_out, y_in), (x_out, y_in),
                         arrowstyle="-|>", mutation_scale=12, linewidth=1.0, color=color, zorder=2)
@@ -120,7 +112,7 @@ def draw_bus_manifold(ax, x_in, y_in, x_out, y_nodes, accent=False):
 
 
 def draw_scope_container(ax, x, y, w, h, title, accent=False):
-    """Draw a subtle background region box grouping logical steps."""
+    """Subtle background region box grouping logical steps."""
     stroke = COLOR_ACCENT_STROKE if accent else COLOR_CONTAINER_STROKE
     fill = COLOR_ACCENT_BG if accent else COLOR_CONTAINER_BG
     alpha = 0.25 if accent else 0.40

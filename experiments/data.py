@@ -1,13 +1,10 @@
-"""experiments/data.py — public multivariate time-series loaders + splits.
+"""Public multivariate time-series loaders + protocol splits.
 
-Sources (public, reproducible):
-  ECL (electricity), Traffic, Exchange-rate : laiguokun/multivariate-time-series-data
-  ETT (ETTh1/ETTm1/ETTh2)                   : zhouhaoyi/ETDataset
-  Weather                                   : Time-Series-Library (thuml)
-
-Splits follow the no-information-leakage protocol of the online-forecasting
-literature (OneNet/DSOF): chronological 20% train / 5% validation / 75% test,
-with per-series normalization statistics computed on the TRAIN segment only.
+Sources (public, reproducible): laiguokun/multivariate-time-series-data
+(electricity, traffic, exchange), zhouhaoyi/ETDataset (ETT), thuml/Time-
+Series-Library (weather). Splits follow the no-leakage protocol of the
+online-forecasting literature: chronological 20/5/75 with per-series
+normalization computed on the train segment only.
 """
 
 import os
@@ -120,14 +117,11 @@ def get_dataset(name: str, train_frac: float = 0.2, val_frac: float = 0.05,
 
 
 def protocol_borders(name: str, len_df: int, seq_len: int = 96) -> dict:
-    """Chronological split borders replicating the DSOF/FSNet official loader.
+    """Chronological split borders matching the official DSOF/FSNet loader.
 
-    See src/data/data_loader.py of yyalau/iclr2025_dsof. ETT uses the classic
-    Autoformer borders (with the seq_len ~lookback offset baked into val/test
-    starts); the others use 20% train / 5% val / 75% test fractions. This is
-    the exact protocol our published rows must be comparable against.
-
-    Returns dict of (start, end) per phase.
+    ETT uses the classic Autoformer borders (with the seq_len lookback offset
+    baked into val/test starts); the others use 20% train / 5% val / 75% test
+    fractions. Returns (start, end) per phase.
     """
     if name in ("etth1", "etth2"):
         return {
@@ -147,20 +141,16 @@ def protocol_borders(name: str, len_df: int, seq_len: int = 96) -> dict:
 
 
 def get_protocol_dataset(name: str, seq_len: int = 96, clip_spikes: float = 0.0) -> dict:
-    """DSOF-protocol-exact dataset: raw -> trim -> StandardScaler(train) -> borders.
+    """Protocol-exact dataset: raw -> trim -> train-only scaler -> borders.
 
-    Mirrors the official (ICLR 2025) DSOF pipeline so our metrics are directly
-    comparable to its Table 2 (batch learning DLinear/FITS/FSNet/OneNet/etc.).
-
-    `clip_spikes` (0 = off): robust-trim flag. The public ECL has a few broken
-    meters whose TEST values run ~100x past their TRAIN range (e.g. channel 146
-    trains 0-12, test reaches 646; z-scored ~690). Every method, DSOF included,
-    scores a fixed catastrophic MSE on those few points (a perfect predictor
-    still loses ~(690)^2 there), and RLS diverges on them in float64. With
-    clip_spikes>0 we sign-preserving clip ANY value in the FULL series that
-    exceeds clip_spikes * train_max_abs(channel) down to that bound, which
-    removes the glitch tail without touching the train distribution. The number
-    of touched channels/points is reported in meta so the paper can disclose it.
+    Mirrors the official DSOF pipeline so metrics are directly comparable to
+    its Table 2. `clip_spikes` (0 = off) robust-trims the public ECL, which
+    has a few broken meters whose TEST values run ~100x past their train
+    range (channel 146 trains 0-12, test reaches 646). Every method scores a
+    fixed catastrophic MSE on those few points; clip_spikes>0 sign-preserving
+    clips any value above clip_spikes * train_max_abs(channel), removing the
+    glitch tail without touching the train distribution. Touched
+    channels/points are reported in meta for disclosure.
 
     Returns dict with 'X' (scaled on train-only stats), 'borders', 'meta'.
     """

@@ -1,13 +1,9 @@
-"""figuregen/manifest.py — build the paper figure manifest + panel count.
+"""Build the figure manifest: PNG count + panel totals per section.
 
-Counts every PNG in figures/, and for multi-panel figures records how the
-panels decompose (each subplot/panel counts as an image — matching the Paper-2
-inventory rule: a 15-panel figure = 15 images; a standalone figure = 1).
-
-Every section writes a small <name>.meta.json next to its figures (produced
-by the section modules when they can count panels deterministically); any
-figure without metadata falls back to 1 panel. manifest.py aggregates them and
-writes figures/manifest.json with totals per section.
+Each multi-panel figure counts as one image per subplot (a 15-panel figure =
+15 panels; a standalone plot = 1). Sections write <name>.meta.json next to
+each figure with a deterministic panel count; figures without metadata fall
+back to 1. Aggregates into figures/manifest.json.
 
 Usage:  PYTHONPATH=. python figuregen/manifest.py [--rebuild]
 """

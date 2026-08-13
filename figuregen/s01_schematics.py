@@ -1,22 +1,8 @@
-"""figuregen/s01_schematics.py — publication-grade TikZ architecture diagrams.
+"""Architecture / protocol schematic figures.
 
-Renders and extracts clean, publication-compliant diagrams adhering to:
-1. Duo-Tone Palette: Grayscale slate for standard elements + Single Amber Accent (#D97706) for proposed solver.
-   - For feature_map: Raw window and output feature vector use White fill + Black stroke; middle transformation blocks use Golden Amber accent fill.
-2. Node Mapping: Rectangles = operations/solvers; Rounded = data/tensors. Labels = 2-5 word noun phrases.
-3. User Sketch Precision Inter-Stage Routing: Connectors drop vertically into stage bodies below stage title lines, running left at y=5.45 and y=2.05 directly into target nodes. 100% collision-free.
-4. Zero Overlaps: Generous vertical and horizontal margins.
-5. Exact Math: Subscript tensor shapes and symbols matching paper equations.
-
-Outputs:
-- figures/01_schematics/pipeline.png / .tex
-- figures/01_schematics/rls_woodbury_update.png / .tex
-- figures/01_schematics/lru_bank.png / .tex
-- figures/01_schematics/feature_map.png / .tex
-- figures/01_schematics/protocol_timeline.png / .tex
-- figures/01_schematics/chaos_core.png / .tex
-- figures/01_schematics/closed_form_vs_backprop.png / .tex
-- figures/01_schematics/full_system.png / .tex  (Master Detailed Vertical Architecture)
+Outputs (all under figures/01_schematics/):
+  pipeline, rls_woodbury_update, lru_bank, feature_map, protocol_timeline,
+  chaos_core, closed_form_vs_backprop, full_system
 """
 
 import os
@@ -32,7 +18,7 @@ OUT = os.path.join(os.path.dirname(__file__), "..", "figures", "01_schematics")
 
 
 def new_canvas(w=13.5, h=5.0):
-    """Create a high-resolution blank paper canvas with generous margins."""
+    """High-resolution blank canvas with generous margins."""
     fig, ax = plt.subplots(figsize=(w, h))
     ax.set_xticks([])
     ax.set_yticks([])
@@ -44,9 +30,7 @@ def new_canvas(w=13.5, h=5.0):
 
 # --- FIGURE 1: PIPELINE ---
 def fig_pipeline():
-    """Closed-form streaming forecasting architecture (S2-RLS).
-    Vertical Top-to-Bottom Layout with clean inter-stage routing inside stage body.
-    """
+    """Closed-form streaming forecasting architecture (S2-RLS)."""
     fig, ax = new_canvas(13.5, 6.5)
 
     draw_scope_container(ax, 0.4, 3.6, 12.7, 2.5, "Offline warm-start phase")
