@@ -20,6 +20,9 @@ upload/
 # Zenodo release archive — not part of the source repo
 normastream-*.zip
 
+# Local diagram editor — kept out of the public repo
+editor/
+
 # OS noise
 .DS_Store
 Thumbs.db
