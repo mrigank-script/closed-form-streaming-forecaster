@@ -1,0 +1,25 @@
+{
+  "dataset": "electricity",
+  "pred_len": 1,
+  "nboot": 200,
+  "block": 4,
+  "rows": [
+    {
+      "dataset": "electricity",
+      "pred_len": 1,
+      "model": "s2",
+      "mse": 51.12378028922676,
+      "mae": 0.5238191861155552,
+      "mse_se": 2.769104235277114,
+      "mae_se": 0.01750910870332047,
+      "mse_p5": 48.67382815510561,
+      "mse_p95": 58.1134587698722,
+      "mae_p5": 0.5042587337711767,
+      "mae_p95": 0.5648332402018297,
+      "nboot": 200,
+      "block": 4,
+      "nchunks": 13,
+      "clip_spikes": 0.0
+    }
+  ]
+}

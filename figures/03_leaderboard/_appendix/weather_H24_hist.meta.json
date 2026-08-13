@@ -1,0 +1,5 @@
+{
+  "panels": 2,
+  "caption": "histogram of published rows + our marker (MSE, MAE)",
+  "file": "weather_H24_hist.png"
+}

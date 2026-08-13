@@ -1,0 +1,5 @@
+{
+  "panels": 3,
+  "caption": "NMSE, lambda1, horizon across seeds",
+  "file": "l96_seed_stats.png"
+}

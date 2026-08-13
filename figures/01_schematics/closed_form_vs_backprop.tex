@@ -1,0 +1,54 @@
+% TikZ Diagram: Iterative backpropagation vs exact one-shot closed-form solving
+% Style: Minimal publication palette (Grayscale structural + Single Accent for proposed module)
+% Rules: Rectangles = Operations/Modules, Rounded = Data/Tensors. Left-to-right flow. Zero line crossing.
+
+\documentclass[tikz,border=10pt]{standalone}
+\usetikzlibrary{shapes.geometric, positioning, arrows.meta, chains, backgrounds}
+
+\definecolor{neutralbg}{HTML}{F8FAFC}
+\definecolor{neutralstroke}{HTML}{64748B}
+\definecolor{neutraltext}{HTML}{0F172A}
+
+\definecolor{accentbg}{HTML}{FEF3C7}
+\definecolor{accentstroke}{HTML}{D97706}
+\definecolor{accenttext}{HTML}{92400E}
+
+\begin{document}
+\begin{tikzpicture}[
+    font=\sffamily\small,
+    node distance=1.0cm and 1.2cm,
+    operation/.style={rectangle, draw=neutralstroke, fill=neutralbg, text=neutraltext, minimum height=1.0cm, minimum width=2.2cm, align=center, line width=0.8pt},
+    proposed_op/.style={rectangle, draw=accentstroke, fill=accentbg, text=accenttext, minimum height=1.0cm, minimum width=2.4cm, align=center, line width=1.2pt, font=\sffamily\bfseries\small},
+    tensor/.style={rounded corners=6pt, draw=neutralstroke, fill=white, text=neutraltext, minimum height=0.9cm, minimum width=2.0cm, align=center, line width=0.8pt},
+    proposed_tensor/.style={rounded corners=6pt, draw=accentstroke, fill=accentbg!50, text=accenttext, minimum height=0.9cm, minimum width=2.2cm, align=center, line width=1.0pt},
+    arrow/.style={-{Stealth[scale=1.0]}, line width=1.0pt, draw=neutralstroke},
+    aux_arrow/.style={-{Stealth[scale=1.0]}, line width=1.0pt, draw=accentstroke, dashed}
+]
+
+    % Left: Iterative Backprop Baseline
+    \node[operation] (bp_init) {Random init\\{\scriptsize $\mathbf{W} \sim \mathcal{N}(0, \sigma^2)$}};
+    \node[operation, right=of bp_init] (bp_fwd) {Forward pass\\{\scriptsize $\hat{y} = f(x; \mathbf{W})$}};
+    \node[operation, right=of bp_fwd] (bp_grad) {Gradient backprop\\{\scriptsize $\nabla_{\mathbf{W}} \mathcal{L}$}};
+    \node[operation, right=of bp_grad] (bp_step) {Optimizer step\\{\scriptsize $\mathbf{W} \leftarrow \mathbf{W} - \eta \nabla_{\mathbf{W}} \mathcal{L}$}};
+
+    \draw[arrow] (bp_init) -- (bp_fwd);
+    \draw[arrow] (bp_fwd) -- (bp_grad);
+    \draw[arrow] (bp_grad) -- (bp_step);
+    \draw[arrow] (bp_step.south) -- ++(0,-0.4) -| (bp_fwd.south) node[pos=0.25, below, font=\scriptsize] {$K = 100+$ epochs};
+
+    % Right / Lower: Proposed Closed-Form Engine
+    \node[proposed_op, below=2.0cm of bp_init] (cf_acc) {Covariance accumulation\\{\scriptsize $\mathbf{A} = \sum \phi \phi^T, \mathbf{B} = \sum \phi x^T$}};
+    \node[proposed_op, right=of cf_acc] (cf_solve) {Direct matrix solve\\{\scriptsize $\mathbf{W}_0 = (\mathbf{A} + \lambda \mathbf{I})^{-1}\mathbf{B}$}};
+    \node[proposed_tensor, right=of cf_solve] (cf_out) {Optimal weight matrix\\{\scriptsize $\mathbf{W}_0 \in \mathbb{R}^{F \times H}$}};
+
+    \draw[arrow] (cf_acc) -- (cf_solve);
+    \draw[arrow] (cf_solve) -- (cf_out);
+
+    % Background labels
+    \begin{scope}[on background layer]
+        \node[draw=neutralstroke!40, fill=neutralbg!40, rounded corners=8pt, fit=(bp_init) (bp_step), label={[anchor=north west, font=\sffamily\bfseries\footnotesize, text=neutraltext]north west:Conventional backpropagation (Iterative SGD/Adam)}] {};
+        \node[draw=accentstroke!40, fill=accentbg!20, rounded corners=8pt, fit=(cf_acc) (cf_out), label={[anchor=north west, font=\sffamily\bfseries\footnotesize, text=accenttext]north west:Ours: Exact one-shot closed-form solve (Zero Backprop)}] {};
+    \end{scope}
+
+\end{tikzpicture}
+\end{document}

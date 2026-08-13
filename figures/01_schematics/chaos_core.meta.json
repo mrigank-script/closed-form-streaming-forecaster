@@ -1,0 +1,5 @@
+{
+  "panels": 1,
+  "caption": "Unified closed-form engine across real-world LTSF and scientific chaos. Demonstrates that a single algebraic solver engine handles both real-world time series and non-linear physical dynamics.",
+  "file": "chaos_core.png"
+}

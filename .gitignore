@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Test / tooling artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+
+# Raw datasets are large and official; experiments.data.download() fetches them
+data/raw/
+
+# Convenience PNG copies for quick upload — figures/ is the source of truth
+upload/
+
+# OS noise
+.DS_Store
+Thumbs.db
+desktop.ini

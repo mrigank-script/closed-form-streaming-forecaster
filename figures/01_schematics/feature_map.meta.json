@@ -1,0 +1,5 @@
+{
+  "panels": 1,
+  "caption": "Causal multi-scale feature vector decomposition (F = 112). Raw window and final feature vector are formatted in clean white/black, while middle transformation blocks highlight feature extraction.",
+  "file": "feature_map.png"
+}

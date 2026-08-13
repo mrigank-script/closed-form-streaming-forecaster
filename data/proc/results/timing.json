@@ -1,0 +1,18 @@
+{
+  "device": "gpu",
+  "reps": 1,
+  "rows": [
+    {
+      "dataset": "traffic",
+      "pred_len": 1,
+      "train_s": 16.674173430999872,
+      "infer_s": 119.62396489300045,
+      "reps": 1,
+      "channels": 862,
+      "n_test": 13158,
+      "n_train": 3508,
+      "n_features": 112,
+      "device": "gpu"
+    }
+  ]
+}

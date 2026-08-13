@@ -1,0 +1,1 @@
+"""figuregen — paper figure suite for Paper 2. See figuregen/README below."""

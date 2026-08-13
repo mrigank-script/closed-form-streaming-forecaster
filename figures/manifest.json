@@ -1,0 +1,397 @@
+{
+  "count_policy": "panels (a multi-panel png counts each panel as one image; a single-plot png counts as 1)",
+  "root": "/mnt/c/Projects/Application of Core Slover/figures",
+  "sections": {
+    "01_schematics": {
+      "png_files": 8,
+      "panels": 8,
+      "files": [
+        {
+          "file": "chaos_core.png",
+          "panels": 1,
+          "meta": {
+            "panels": 1,
+            "caption": "Unified closed-form engine across real-world LTSF and scientific chaos. Demonstrates that a single algebraic solver engine handles both real-world time series and non-linear physical dynamics.",
+            "file": "chaos_core.png"
+          }
+        },
+        {
+          "file": "closed_form_vs_backprop.png",
+          "panels": 1,
+          "meta": {
+            "panels": 1,
+            "caption": "Iterative backpropagation vs. exact one-shot closed-form solving. Demonstrates the operational shift from K-epoch SGD iteration to exact single-pass matrix algebra.",
+            "file": "closed_form_vs_backprop.png"
+          }
+        },
+        {
+          "file": "feature_map.png",
+          "panels": 1,
+          "meta": {
+            "panels": 1,
+            "caption": "Causal multi-scale feature vector decomposition (F = 112). Raw window and final feature vector are formatted in clean white/black, while middle transformation blocks highlight feature extraction.",
+            "file": "feature_map.png"
+          }
+        },
+        {
+          "file": "full_system.png",
+          "panels": 1,
+          "meta": {
+            "panels": 1,
+            "caption": "Master comprehensive system architecture diagram for the closed-form streaming forecasting engine (S2-RLS). Perpendicular vertical topology details multi-scale feature extraction, complex LRU memory projection, warm-start ridge solve, and real-time Woodbury RLS online adaptation.",
+            "file": "full_system.png"
+          }
+        },
+        {
+          "file": "lru_bank.png",
+          "panels": 1,
+          "meta": {
+            "panels": 1,
+            "caption": "S2 Linear Recurrent Unit (S2-LRU) context bank architecture. A fixed random bank of complex diagonal recurrent units extracts multi-scale temporal context.",
+            "file": "lru_bank.png"
+          }
+        },
+        {
+          "file": "pipeline.png",
+          "panels": 1,
+          "meta": {
+            "panels": 1,
+            "caption": "Closed-form streaming forecasting architecture (S2-RLS). Rectangles represent operations, rounded cards represent data representations. Amber highlights the proposed closed-form solver and online Woodbury update.",
+            "file": "pipeline.png"
+          }
+        },
+        {
+          "file": "protocol_timeline.png",
+          "panels": 1,
+          "meta": {
+            "panels": 1,
+            "caption": "Strict zero-data-leakage evaluation protocol timeline. Ensures standardization statistics and warm-start weights use only historical train observations.",
+            "file": "protocol_timeline.png"
+          }
+        },
+        {
+          "file": "rls_woodbury_update.png",
+          "panels": 1,
+          "meta": {
+            "panels": 1,
+            "caption": "Mathematical mechanics of the online Woodbury RLS update. Demonstrates exact rank-1 update of the inverse covariance matrix without full O(F\u00b3) re-inversion.",
+            "file": "rls_woodbury_update.png"
+          }
+        }
+      ]
+    },
+    "02_dataset": {
+      "png_files": 4,
+      "panels": 10,
+      "files": [
+        {
+          "file": "ecl_spike_ch114.png",
+          "panels": 3,
+          "meta": {
+            "panels": 3,
+            "caption": "train, test, |z| distribution",
+            "file": "ecl_spike_ch114.png"
+          }
+        },
+        {
+          "file": "ecl_spike_ch146.png",
+          "panels": 3,
+          "meta": {
+            "panels": 3,
+            "caption": "train, test, |z| distribution",
+            "file": "ecl_spike_ch146.png"
+          }
+        },
+        {
+          "file": "ecl_trim_ch114.png",
+          "panels": 2,
+          "meta": {
+            "panels": 2,
+            "caption": "raw vs clip",
+            "file": "ecl_trim_ch114.png"
+          }
+        },
+        {
+          "file": "ecl_trim_ch146.png",
+          "panels": 2,
+          "meta": {
+            "panels": 2,
+            "caption": "raw vs clip",
+            "file": "ecl_trim_ch146.png"
+          }
+        }
+      ]
+    },
+    "03_leaderboard": {
+      "png_files": 10,
+      "panels": 25,
+      "files": [
+        {
+          "file": "etth2_H1_bars.png",
+          "panels": 2,
+          "meta": {
+            "panels": 2,
+            "caption": "published MSE cells (grey) vs ours with block-bootstrap [p5,p95] whiskers; published cells are single-point table values (no std supplied)",
+            "file": "etth2_H1_bars.png"
+          }
+        },
+        {
+          "file": "etth2_summary.png",
+          "panels": 3,
+          "meta": {
+            "panels": 3,
+            "caption": "MSE by H, beats-count, bootstrap intervals (log scale)",
+            "file": "etth2_summary.png"
+          }
+        },
+        {
+          "file": "ettm1_H1_bars.png",
+          "panels": 2,
+          "meta": {
+            "panels": 2,
+            "caption": "published MSE cells (grey) vs ours with block-bootstrap [p5,p95] whiskers; published cells are single-point table values (no std supplied)",
+            "file": "ettm1_H1_bars.png"
+          }
+        },
+        {
+          "file": "ettm1_summary.png",
+          "panels": 3,
+          "meta": {
+            "panels": 3,
+            "caption": "MSE by H, beats-count, bootstrap intervals (log scale)",
+            "file": "ettm1_summary.png"
+          }
+        },
+        {
+          "file": "exchange_H1_bars.png",
+          "panels": 2,
+          "meta": {
+            "panels": 2,
+            "caption": "published MSE cells (grey) vs ours with block-bootstrap [p5,p95] whiskers; published cells are single-point table values (no std supplied)",
+            "file": "exchange_H1_bars.png"
+          }
+        },
+        {
+          "file": "exchange_summary.png",
+          "panels": 3,
+          "meta": {
+            "panels": 3,
+            "caption": "MSE by H, beats-count, bootstrap intervals (log scale)",
+            "file": "exchange_summary.png"
+          }
+        },
+        {
+          "file": "traffic_H1_bars.png",
+          "panels": 2,
+          "meta": {
+            "panels": 2,
+            "caption": "published MSE cells (grey) vs ours with block-bootstrap [p5,p95] whiskers; published cells are single-point table values (no std supplied)",
+            "file": "traffic_H1_bars.png"
+          }
+        },
+        {
+          "file": "traffic_summary.png",
+          "panels": 3,
+          "meta": {
+            "panels": 3,
+            "caption": "MSE by H, beats-count, bootstrap intervals (log scale)",
+            "file": "traffic_summary.png"
+          }
+        },
+        {
+          "file": "weather_H1_bars.png",
+          "panels": 2,
+          "meta": {
+            "panels": 2,
+            "caption": "published MSE cells (grey) vs ours with block-bootstrap [p5,p95] whiskers; published cells are single-point table values (no std supplied)",
+            "file": "weather_H1_bars.png"
+          }
+        },
+        {
+          "file": "weather_summary.png",
+          "panels": 3,
+          "meta": {
+            "panels": 3,
+            "caption": "MSE by H, beats-count, bootstrap intervals (log scale)",
+            "file": "weather_summary.png"
+          }
+        }
+      ]
+    },
+    "04_electricity": {
+      "png_files": 6,
+      "panels": 9,
+      "files": [
+        {
+          "file": "bootstrap_raw.png",
+          "panels": 2,
+          "meta": {
+            "panels": 2,
+            "caption": "bootstrap MSE and MAE for raw-protocol rows",
+            "file": "bootstrap_raw.png"
+          }
+        },
+        {
+          "file": "energy_outliers.png",
+          "panels": 1,
+          "meta": {
+            "panels": 1,
+            "caption": "",
+            "file": "energy_outliers.png"
+          }
+        },
+        {
+          "file": "mse_se_raw.png",
+          "panels": 1,
+          "meta": {
+            "panels": 1,
+            "caption": "MSE standard error per model on raw protocol",
+            "file": "mse_se_raw.png"
+          }
+        },
+        {
+          "file": "persistence_floor.png",
+          "panels": 2,
+          "meta": {
+            "panels": 2,
+            "caption": "raw floor + corrected floor",
+            "file": "persistence_floor.png"
+          }
+        },
+        {
+          "file": "raw_vs_clip_bars.png",
+          "panels": 1,
+          "meta": {
+            "panels": 1,
+            "caption": "",
+            "file": "raw_vs_clip_bars.png"
+          }
+        },
+        {
+          "file": "s2_damping.png",
+          "panels": 2,
+          "meta": {
+            "panels": 2,
+            "caption": "MSE + MAE across variants",
+            "file": "s2_damping.png"
+          }
+        }
+      ]
+    },
+    "05_s2_lru": {
+      "png_files": 4,
+      "panels": 6,
+      "files": [
+        {
+          "file": "ettm1_rls_vs_s2rls.png",
+          "panels": 2,
+          "meta": {
+            "panels": 2,
+            "caption": "MSE + MAE with SE",
+            "file": "ettm1_rls_vs_s2rls.png"
+          }
+        },
+        {
+          "file": "lru_impulse.png",
+          "panels": 1,
+          "meta": {
+            "panels": 1,
+            "caption": "impulse response |lambda|^t per oscillator + 96-step window cutoff",
+            "file": "lru_impulse.png"
+          }
+        },
+        {
+          "file": "lru_spectrum.png",
+          "panels": 2,
+          "meta": {
+            "panels": 2,
+            "caption": "eigenvalues + decay timescale",
+            "file": "lru_spectrum.png"
+          }
+        },
+        {
+          "file": "s2_across_datasets.png",
+          "panels": 1,
+          "meta": {
+            "panels": 1,
+            "caption": "percentage MSE change of S2RLS vs RLS across datasets",
+            "file": "s2_across_datasets.png"
+          }
+        }
+      ]
+    },
+    "06_chaos": {
+      "png_files": 7,
+      "panels": 13,
+      "files": [
+        {
+          "file": "l96_free_run_error.png",
+          "panels": 1,
+          "meta": {
+            "panels": 1,
+            "caption": "",
+            "file": "l96_free_run_error.png"
+          }
+        },
+        {
+          "file": "l96_nmse_seeds.png",
+          "panels": 1,
+          "meta": {
+            "panels": 1,
+            "caption": "step-NMSE mean/std across seeds (JSON)",
+            "file": "l96_nmse_seeds.png"
+          }
+        },
+        {
+          "file": "l96_phase_portrait.png",
+          "panels": 1,
+          "meta": {
+            "panels": 1,
+            "caption": "phase portrait: attractor ring (truth) + free-run arc",
+            "file": "l96_phase_portrait.png"
+          }
+        },
+        {
+          "file": "l96_seed_stats.png",
+          "panels": 3,
+          "meta": {
+            "panels": 3,
+            "caption": "NMSE, lambda1, horizon across seeds",
+            "file": "l96_seed_stats.png"
+          }
+        },
+        {
+          "file": "l96_traces.png",
+          "panels": 2,
+          "meta": {
+            "panels": 2,
+            "caption": "one-step + free-run traces",
+            "file": "l96_traces.png"
+          }
+        },
+        {
+          "file": "narma_nmse.png",
+          "panels": 1,
+          "meta": {
+            "panels": 1,
+            "caption": "",
+            "file": "narma_nmse.png"
+          }
+        },
+        {
+          "file": "narma_recon.png",
+          "panels": 4,
+          "meta": {
+            "panels": 4,
+            "caption": "reconstruction + residuals for NARMA10/30",
+            "file": "narma_recon.png"
+          }
+        }
+      ]
+    }
+  },
+  "totals": {
+    "png_files": 39,
+    "panels": 71
+  }
+}

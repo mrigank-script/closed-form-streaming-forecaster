@@ -1,0 +1,5 @@
+{
+  "panels": 2,
+  "caption": "per-step MSE + MAE",
+  "file": "weather_H24_horizon.png"
+}

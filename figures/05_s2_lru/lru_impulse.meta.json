@@ -1,0 +1,5 @@
+{
+  "panels": 1,
+  "caption": "impulse response |lambda|^t per oscillator + 96-step window cutoff",
+  "file": "lru_impulse.png"
+}

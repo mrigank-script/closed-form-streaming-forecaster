@@ -1,0 +1,5 @@
+{
+  "panels": 1,
+  "caption": "percentage MSE change of S2RLS vs RLS across datasets",
+  "file": "s2_across_datasets.png"
+}

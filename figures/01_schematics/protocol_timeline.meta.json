@@ -1,0 +1,5 @@
+{
+  "panels": 1,
+  "caption": "Strict zero-data-leakage evaluation protocol timeline. Ensures standardization statistics and warm-start weights use only historical train observations.",
+  "file": "protocol_timeline.png"
+}

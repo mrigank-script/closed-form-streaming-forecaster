@@ -1,0 +1,5 @@
+{
+  "panels": 1,
+  "caption": "Master comprehensive system architecture diagram for the closed-form streaming forecasting engine (S2-RLS). Perpendicular vertical topology details multi-scale feature extraction, complex LRU memory projection, warm-start ridge solve, and real-time Woodbury RLS online adaptation.",
+  "file": "full_system.png"
+}

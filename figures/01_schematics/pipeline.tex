@@ -1,0 +1,58 @@
+% TikZ Diagram: Closed-form streaming forecasting architecture (S2-RLS)
+% Style: 100% Perpendicular Vertical Architecture (ZERO diagonal lines)
+% Rules: Rectangles = Operations/Modules, Rounded = Data/Tensors.
+
+\documentclass[tikz,border=10pt]{standalone}
+\usetikzlibrary{shapes.geometric, positioning, arrows.meta, chains, backgrounds}
+
+\definecolor{neutralbg}{HTML}{F8FAFC}
+\definecolor{neutralstroke}{HTML}{64748B}
+\definecolor{neutraltext}{HTML}{0F172A}
+
+\definecolor{accentbg}{HTML}{FEF3C7}
+\definecolor{accentstroke}{HTML}{D97706}
+\definecolor{accenttext}{HTML}{92400E}
+
+\begin{document}
+\begin{tikzpicture}[
+    font=\sffamily\small,
+    node distance=1.0cm and 1.2cm,
+    operation/.style={rectangle, draw=neutralstroke, fill=neutralbg, text=neutraltext, minimum height=0.9cm, minimum width=2.2cm, align=center, line width=0.8pt},
+    proposed_op/.style={rectangle, draw=accentstroke, fill=accentbg, text=accenttext, minimum height=1.0cm, minimum width=2.4cm, align=center, line width=1.2pt, font=\sffamily\bfseries\small},
+    tensor/.style={rounded corners=6pt, draw=neutralstroke, fill=white, text=neutraltext, minimum height=0.9cm, minimum width=2.0cm, align=center, line width=0.8pt},
+    proposed_tensor/.style={rounded corners=6pt, draw=accentstroke, fill=accentbg!50, text=accenttext, minimum height=0.9cm, minimum width=2.2cm, align=center, line width=1.0pt},
+    arrow/.style={-{Stealth[scale=1.0]}, line width=1.0pt, draw=neutralstroke},
+    aux_arrow/.style={-{Stealth[scale=1.0]}, line width=1.0pt, draw=accentstroke, dashed}
+]
+
+    % --- PHASE 1: WARM-START INITIALIZATION (TOP) ---
+    \node[tensor] (x_hist) {Historical stream\\{\scriptsize $\mathbf{x}_{1:T} \in \mathbb{R}^T$}};
+    \node[operation, right=of x_hist] (norm) {Standardization\\{\scriptsize $\mu_{\text{train}}, \sigma_{\text{train}}$}};
+    \node[tensor, right=of norm] (phi) {Feature vector\\{\scriptsize $\phi(t) \in \mathbb{R}^F$}};
+    \node[proposed_op, right=of phi] (ridge) {Exact ridge solve\\{\scriptsize $\mathbf{W}_0 = (\mathbf{A} + \lambda \mathbf{I})^{-1}\mathbf{B}$}};
+
+    \draw[arrow] (x_hist) -- (norm);
+    \draw[arrow] (norm) -- (phi);
+    \draw[arrow] (phi) -- (ridge);
+
+    % --- PHASE 2: ONLINE STREAMING UPDATE (BOTTOM) ---
+    \node[tensor, below=1.8cm of x_hist] (x_t) {Streaming input\\{\scriptsize $\mathbf{x}_t \in \mathbb{R}$}};
+    \node[operation, right=of x_t] (pred) {Real-time forecast\\{\scriptsize $\hat{\mathbf{x}}_{t+r} = \mathbf{W}_t^T \phi_t$}};
+    \node[tensor, right=of pred] (error) {Innovation error\\{\scriptsize $e_t = x_t - \hat{x}_t$}};
+    \node[proposed_op, right=of error] (woodbury) {Woodbury RLS update\\{\scriptsize $\mathbf{A}_t^{-1}$ rank-1 step}};
+
+    \draw[arrow] (x_t) -- (pred);
+    \draw[arrow] (pred) -- (error);
+    \draw[arrow] (error) -- (woodbury);
+
+    % Perpendicular Seed Weight Connector
+    \draw[aux_arrow] (ridge.south) |- node[near start, right, font=\scriptsize] {Seed weights $\mathbf{W}_0$} (pred.north);
+
+    % Background containers
+    \begin{scope}[on background layer]
+        \node[draw=neutralstroke!40, fill=neutralbg!40, rounded corners=8pt, fit=(x_hist) (ridge), label={[anchor=north west, font=\sffamily\bfseries\footnotesize, text=neutraltext]north west:Offline warm-start phase}] {};
+        \node[draw=accentstroke!40, fill=accentbg!20, rounded corners=8pt, fit=(x_t) (woodbury), label={[anchor=north west, font=\sffamily\bfseries\footnotesize, text=accenttext]north west:Online streaming phase}] {};
+    \end{scope}
+
+\end{tikzpicture}
+\end{document}

@@ -1,0 +1,5 @@
+{
+  "panels": 1,
+  "caption": "step-NMSE mean/std across seeds (JSON)",
+  "file": "l96_nmse_seeds.png"
+}

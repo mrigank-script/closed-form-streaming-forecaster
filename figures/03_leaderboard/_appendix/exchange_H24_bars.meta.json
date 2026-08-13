@@ -1,0 +1,5 @@
+{
+  "panels": 2,
+  "caption": "published MSE cells (grey) vs ours with block-bootstrap [p5,p95] whiskers; published cells are single-point table values (no std supplied)",
+  "file": "exchange_H24_bars.png"
+}

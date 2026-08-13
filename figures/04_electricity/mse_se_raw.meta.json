@@ -1,0 +1,5 @@
+{
+  "panels": 1,
+  "caption": "MSE standard error per model on raw protocol",
+  "file": "mse_se_raw.png"
+}

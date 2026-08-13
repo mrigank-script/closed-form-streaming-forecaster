@@ -1,0 +1,5 @@
+{
+  "panels": 1,
+  "caption": "Mathematical mechanics of the online Woodbury RLS update. Demonstrates exact rank-1 update of the inverse covariance matrix without full O(F\u00b3) re-inversion.",
+  "file": "rls_woodbury_update.png"
+}

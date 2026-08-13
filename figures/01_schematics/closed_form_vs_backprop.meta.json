@@ -1,0 +1,5 @@
+{
+  "panels": 1,
+  "caption": "Iterative backpropagation vs. exact one-shot closed-form solving. Demonstrates the operational shift from K-epoch SGD iteration to exact single-pass matrix algebra.",
+  "file": "closed_form_vs_backprop.png"
+}

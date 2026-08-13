@@ -1,0 +1,72 @@
+% TikZ Diagram: Full master system architecture (S2-RLS Closed-Form Streaming Engine)
+% Master comprehensive vertical diagram with 100% perpendicular connectors (ZERO diagonal lines).
+
+\documentclass[tikz,border=10pt]{standalone}
+\usetikzlibrary{shapes.geometric, positioning, arrows.meta, chains, backgrounds}
+
+\definecolor{neutralbg}{HTML}{F8FAFC}
+\definecolor{neutralstroke}{HTML}{64748B}
+\definecolor{neutraltext}{HTML}{0F172A}
+
+\definecolor{accentbg}{HTML}{FEF3C7}
+\definecolor{accentstroke}{HTML}{D97706}
+\definecolor{accenttext}{HTML}{92400E}
+
+\begin{document}
+\begin{tikzpicture}[
+    font=\sffamily\small,
+    node distance=0.8cm and 1.0cm,
+    operation/.style={rectangle, draw=neutralstroke, fill=neutralbg, text=neutraltext, minimum height=0.9cm, minimum width=2.2cm, align=center, line width=0.8pt},
+    proposed_op/.style={rectangle, draw=accentstroke, fill=accentbg, text=accenttext, minimum height=1.0cm, minimum width=2.4cm, align=center, line width=1.2pt, font=\sffamily\bfseries\small},
+    tensor/.style={rounded corners=6pt, draw=neutralstroke, fill=white, text=neutraltext, minimum height=0.9cm, minimum width=2.0cm, align=center, line width=0.8pt},
+    proposed_tensor/.style={rounded corners=6pt, draw=accentstroke, fill=accentbg!50, text=accenttext, minimum height=0.9cm, minimum width=2.2cm, align=center, line width=1.0pt},
+    wb_tensor/.style={rounded corners=6pt, draw=neutraltext, fill=white, text=neutraltext, minimum height=0.9cm, minimum width=2.0cm, align=center, line width=1.0pt},
+    arrow/.style={-{Stealth[scale=1.0]}, line width=1.0pt, draw=neutralstroke},
+    aux_arrow/.style={-{Stealth[scale=1.0]}, line width=1.0pt, draw=accentstroke, dashed}
+]
+
+    % Stage 1: Feature & Memory Extraction (Top Row)
+    \node[wb_tensor] (raw) {Raw stream window\\{\scriptsize $x[t-95 \dots t]$}};
+    \node[proposed_op, right=of raw] (feat) {Multi-scale feature map\\{\scriptsize Stats + Lags + FFT + Cyclic}};
+    \node[proposed_op, right=of feat] (lru) {Complex S2-LRU bank\\{\scriptsize $h_{t,d} = \lambda_d h_{t-1,d} + \gamma_d x_t$}};
+    \node[wb_tensor, right=of lru] (phi) {Augmented vector\\{\scriptsize $\phi_{\text{S2}}(t) \in \mathbb{R}^{F+2D}$}};
+
+    \draw[arrow] (raw) -- (feat);
+    \draw[arrow] (feat) -- (lru);
+    \draw[arrow] (lru) -- (phi);
+
+    % Stage 2: Offline Warm-Start Solve (Middle Row)
+    \node[operation, below=1.4cm of feat] (cov) {Covariance accumulation\\{\scriptsize $\mathbf{A} = \sum \phi \phi^T, \mathbf{B} = \sum \phi x^T$}};
+    \node[proposed_op, right=of cov] (solve) {Exact direct solve\\{\scriptsize $\mathbf{W}_0 = (\mathbf{A} + \lambda \mathbf{I})^{-1}\mathbf{B}$}};
+    \node[proposed_tensor, right=of solve] (w0) {Initial weights\\{\scriptsize $\mathbf{W}_0 \in \mathbb{R}^{(F+2D) \times H}$}};
+
+    \draw[arrow] (cov) -- (solve);
+    \draw[arrow] (solve) -- (w0);
+
+    % Perpendicular connector from Stage 1 to Stage 2
+    \draw[arrow] (phi.south) |- node[near start, right, font=\scriptsize] {Feature vector $\phi_{\text{S2}}(t)$} (cov.north);
+
+    % Stage 3: Online Woodbury RLS Engine (Bottom Row)
+    \node[tensor, below=1.4cm of cov] (x_t) {Streaming input\\{\scriptsize $x_t \in \mathbb{R}$}};
+    \node[operation, right=of x_t] (pred) {Real-time forecast\\{\scriptsize $\hat{x}_{t+r} = \mathbf{W}_t^T \phi_t$}};
+    \node[tensor, right=of pred] (error) {Innovation error\\{\scriptsize $e_t = x_t - \hat{x}_t$}};
+    \node[proposed_op, right=of error] (woodbury) {Woodbury RLS update\\{\scriptsize $\mathbf{A}_t^{-1} \text{ rank-1 step}$}};
+    \node[proposed_tensor, right=of woodbury] (wt) {Updated weights\\{\scriptsize $\mathbf{W}_t \in \mathbb{R}^{(F+2D) \times H}$}};
+
+    \draw[arrow] (x_t) -- (pred);
+    \draw[arrow] (pred) -- (error);
+    \draw[arrow] (error) -- (woodbury);
+    \draw[arrow] (woodbury) -- (wt);
+
+    % Perpendicular connector from Stage 2 to Stage 3 (Seed Weights)
+    \draw[aux_arrow] (w0.south) |- node[near start, right, font=\scriptsize] {Seed weights $\mathbf{W}_0$} (pred.north);
+
+    % Background Scope Frames
+    \begin{scope}[on background layer]
+        \node[draw=neutralstroke!40, fill=neutralbg!40, rounded corners=8pt, fit=(raw) (phi), label={[anchor=north west, font=\sffamily\bfseries\footnotesize, text=neutraltext]north west:Stage 1: Multi-scale feature \& LRU memory extraction}] {};
+        \node[draw=accentstroke!40, fill=accentbg!20, rounded corners=8pt, fit=(cov) (solve) (w0), label={[anchor=north west, font=\sffamily\bfseries\footnotesize, text=accenttext]north west:Stage 2: Closed-form warm-start ridge solve}] {};
+        \node[draw=accentstroke!40, fill=accentbg!20, rounded corners=8pt, fit=(x_t) (wt), label={[anchor=north west, font=\sffamily\bfseries\footnotesize, text=accenttext]north west:Stage 3: Real-time online Woodbury RLS engine}] {};
+    \end{scope}
+
+\end{tikzpicture}
+\end{document}

@@ -1,0 +1,5 @@
+{
+  "panels": 1,
+  "caption": "Closed-form streaming forecasting architecture (S2-RLS). Rectangles represent operations, rounded cards represent data representations. Amber highlights the proposed closed-form solver and online Woodbury update.",
+  "file": "pipeline.png"
+}

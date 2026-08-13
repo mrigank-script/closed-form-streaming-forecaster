@@ -1,0 +1,77 @@
+{
+  "source": {
+    "title": "Fast and Slow Streams for Online Time Series Forecasting Without Information Leakage",
+    "venue": "ICLR 2025",
+    "authors": ["Lau Ying-yee Ava", "Shao Zhiwen", "Yeung Dit-Yan"],
+    "table": "Table 2 (average MSE over 5 seeds; lookback L=192 for ECL, L=96 elsewhere; H in {1, 24, 48})",
+    "url": "https://openreview.net/forum?id=I0n3EyogMi",
+    "code": "https://github.com/yyalau/iclr2025_dsof",
+    "note": "Batch Learning = teacher-only (DLinear backbone shown); DSOF = proposed dual-stream online frame. Metrics are MSE on standardized data; protocol: 20/5/75 train/val/test split (FSNet-style), no-information-leakage online evaluation.",
+    "retrieved": "2026-08-12"
+  },
+  "methods": {
+    "DLinear": {"type": "linear", "note": "batch teacher used for the DSOF fast/slow comparison"},
+    "FITS": {"type": "linear"},
+    "FSNet": {"type": "conv"}, 
+    "OneNet": {"type": "conv"},
+    "iTransformer": {"type": "transformer"},
+    "PatchTST": {"type": "transformer"},
+    "NSTrans": {"type": "transformer"}
+  },
+  "rows": {
+    "electricity": {
+      "DLinear":  {"1": {"batch": 2.842, "dsof": 2.065}, "24": {"batch": 15.0, "dsof": 4.737}, "48": {"batch": 27.0, "dsof": 6.181}},
+      "FITS":     {"1": {"batch": 2.870, "dsof": 2.235}, "24": {"batch": 4.509, "dsof": 4.597}, "48": {"batch": 5.257, "dsof": 5.433}},
+      "FSNet":    {"1": {"batch": 380.0, "dsof": 2.330}, "24": {"batch": 470.0, "dsof": 5.475}, "48": {"batch": 480.0, "dsof": 7.000}},
+      "OneNet":   {"1": {"batch": 32.0, "dsof": 4.733}, "24": {"batch": 85.0, "dsof": 4.510}, "48": {"batch": 150.0, "dsof": 5.943}},
+      "iTransformer": {"1": {"batch": 1.976, "dsof": 2.430}, "24": {"batch": 4.119, "dsof": 5.155}, "48": {"batch": 4.936, "dsof": 6.015}},
+      "PatchTST": {"1": {"batch": 4.770, "dsof": 2.244}, "24": {"batch": 17.0, "dsof": 5.169}, "48": {"batch": 17.0, "dsof": 6.665}},
+      "NSTrans":  {"1": {"batch": 39.0, "dsof": 2.703}, "24": {"batch": 40.0, "dsof": 8.668}, "48": {"batch": 38.0, "dsof": 9.981}}
+    },
+    "etth2": {
+      "DLinear":  {"1": {"batch": 0.470, "dsof": 0.365}, "24": {"batch": 2.269, "dsof": 1.701}, "48": {"batch": 3.389, "dsof": 3.082}},
+      "FITS":     {"1": {"batch": 0.522, "dsof": 0.375}, "24": {"batch": 2.189, "dsof": 1.757}, "48": {"batch": 3.275, "dsof": 2.988}},
+      "FSNet":    {"1": {"batch": 11.0, "dsof": 0.431}, "24": {"batch": 19.0, "dsof": 3.114}, "48": {"batch": 23.0, "dsof": 5.318}},
+      "OneNet":   {"1": {"batch": 2.531, "dsof": 0.548}, "24": {"batch": 7.017, "dsof": 2.363}, "48": {"batch": 9.790, "dsof": 4.037}},
+      "iTransformer": {"1": {"batch": 0.872, "dsof": 0.384}, "24": {"batch": 2.688, "dsof": 1.869}, "48": {"batch": 3.769, "dsof": 3.465}},
+      "PatchTST": {"1": {"batch": 0.915, "dsof": 0.382}, "24": {"batch": 5.213, "dsof": 1.925}, "48": {"batch": 6.566, "dsof": 4.473}},
+      "NSTrans":  {"1": {"batch": 3.088, "dsof": 0.415}, "24": {"batch": 3.973, "dsof": 2.127}, "48": {"batch": 4.840, "dsof": 4.729}}
+    },
+    "ettm1": {
+      "DLinear":  {"1": {"batch": 0.112, "dsof": 0.105}, "24": {"batch": 0.628, "dsof": 0.525}, "48": {"batch": 0.818, "dsof": 0.695}},
+      "FITS":     {"1": {"batch": 0.123, "dsof": 0.111}, "24": {"batch": 0.732, "dsof": 0.542}, "48": {"batch": 0.900, "dsof": 0.716}},
+      "FSNet":    {"1": {"batch": 0.190, "dsof": 0.121}, "24": {"batch": 1.500, "dsof": 0.609}, "48": {"batch": 2.279, "dsof": 0.843}},
+      "OneNet":   {"1": {"batch": 0.156, "dsof": 0.096}, "24": {"batch": 1.094, "dsof": 0.418}, "48": {"batch": 1.588, "dsof": 0.554}},
+      "iTransformer": {"1": {"batch": 0.179, "dsof": 0.152}, "24": {"batch": 1.049, "dsof": 0.618}, "48": {"batch": 1.320, "dsof": 0.856}},
+      "PatchTST": {"1": {"batch": 0.155, "dsof": 0.108}, "24": {"batch": 1.170, "dsof": 0.582}, "48": {"batch": 2.103, "dsof": 0.805}},
+      "NSTrans":  {"1": {"batch": 1.101, "dsof": 0.141}, "24": {"batch": 1.503, "dsof": 0.904}, "48": {"batch": 1.547, "dsof": 1.119}}
+    },
+    "exchange": {
+      "DLinear":  {"1": {"batch": 0.009, "dsof": 0.009}, "24": {"batch": 0.098, "dsof": 0.095}, "48": {"batch": 0.194, "dsof": 0.192}},
+      "FITS":     {"1": {"batch": 0.012, "dsof": 0.011}, "24": {"batch": 0.095, "dsof": 0.093}, "48": {"batch": 0.178, "dsof": 0.176}},
+      "FSNet":    {"1": {"batch": 0.034, "dsof": 0.010}, "24": {"batch": 0.754, "dsof": 0.120}, "48": {"batch": 1.366, "dsof": 0.270}},
+      "OneNet":   {"1": {"batch": 0.024, "dsof": 0.009}, "24": {"batch": 0.487, "dsof": 0.152}, "48": {"batch": 0.815, "dsof": 0.289}},
+      "iTransformer": {"1": {"batch": 0.011, "dsof": 0.010}, "24": {"batch": 0.117, "dsof": 0.110}, "48": {"batch": 0.209, "dsof": 0.218}},
+      "PatchTST": {"1": {"batch": 0.024, "dsof": 0.011}, "24": {"batch": 0.443, "dsof": 0.103}, "48": {"batch": 1.107, "dsof": 0.213}},
+      "NSTrans":  {"1": {"batch": 0.234, "dsof": 0.015}, "24": {"batch": 0.335, "dsof": 0.127}, "48": {"batch": 0.449, "dsof": 0.280}}
+    },
+    "traffic": {
+      "DLinear":  {"1": {"batch": 0.302, "dsof": 0.302}, "24": {"batch": 0.649, "dsof": 0.608}, "48": {"batch": 0.769, "dsof": 0.681}},
+      "FITS":     {"1": {"batch": 0.342, "dsof": 0.313}, "24": {"batch": 0.617, "dsof": 0.607}, "48": {"batch": 0.707, "dsof": 0.680}},
+      "FSNet":    {"1": {"batch": 0.599, "dsof": 0.228}, "24": {"batch": 0.761, "dsof": 0.366}, "48": {"batch": 0.824, "dsof": 0.403}},
+      "OneNet":   {"1": {"batch": 0.265, "dsof": 0.264}, "24": {"batch": 0.576, "dsof": 0.327}, "48": {"batch": 0.683, "dsof": 0.369}},
+      "iTransformer": {"1": {"batch": 0.243, "dsof": 0.242}, "24": {"batch": 0.459, "dsof": 0.422}, "48": {"batch": 0.517, "dsof": 0.457}},
+      "PatchTST": {"1": {"batch": 0.280, "dsof": 0.232}, "24": {"batch": 0.573, "dsof": 0.432}, "48": {"batch": 0.621, "dsof": 0.454}},
+      "NSTrans":  {"1": {"batch": 0.762, "dsof": 0.257}, "24": {"batch": 1.102, "dsof": 0.565}, "48": {"batch": 1.001, "dsof": 0.604}}
+    },
+    "weather": {
+      "DLinear":  {"1": {"batch": 0.357, "dsof": 0.337}, "24": {"batch": 1.182, "dsof": 1.043}, "48": {"batch": 1.702, "dsof": 1.447}},
+      "FITS":     {"1": {"batch": 0.359, "dsof": 0.341}, "24": {"batch": 1.236, "dsof": 1.086}, "48": {"batch": 1.634, "dsof": 1.434}},
+      "FSNet":    {"1": {"batch": 0.728, "dsof": 0.388}, "24": {"batch": 1.760, "dsof": 1.020}, "48": {"batch": 2.620, "dsof": 1.415}},
+      "OneNet":   {"1": {"batch": 0.478, "dsof": 0.296}, "24": {"batch": 1.377, "dsof": 0.671}, "48": {"batch": 2.699, "dsof": 0.909}},
+      "iTransformer": {"1": {"batch": 0.474, "dsof": 0.336}, "24": {"batch": 1.492, "dsof": 1.019}, "48": {"batch": 1.740, "dsof": 1.435}},
+      "PatchTST": {"1": {"batch": 0.423, "dsof": 0.361}, "24": {"batch": 1.494, "dsof": 0.877}, "48": {"batch": 2.033, "dsof": 1.308}},
+      "NSTrans":  {"1": {"batch": 2.489, "dsof": 0.336}, "24": {"batch": 2.881, "dsof": 1.037}, "48": {"batch": 3.039, "dsof": 1.419}}
+    }
+  }
+}

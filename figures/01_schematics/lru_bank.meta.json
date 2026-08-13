@@ -1,0 +1,5 @@
+{
+  "panels": 1,
+  "caption": "S2 Linear Recurrent Unit (S2-LRU) context bank architecture. A fixed random bank of complex diagonal recurrent units extracts multi-scale temporal context.",
+  "file": "lru_bank.png"
+}
