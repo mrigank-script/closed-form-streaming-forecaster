@@ -32,7 +32,7 @@ per-channel normalization statistics from TRAIN only, chronological
 — the exact protocol of the online-forecasting literature (OneNet, NeurIPS
 2023; DSOF, ICLR 2025).
 
-### Headline results (see `docs/paper_context.md` for the full narrative)
+### Headline results
 - **Leaderboard**: against the published batch/dsof cells of seven methods on
   ETT h2 / ETTm1 / Exchange / Weather / Traffic, our `rls` row is **rank #1 on
   Exchange-H24**, **rank #2 on 9 of 12 (dataset, H) cells**, mean rank ≈ 2.7 / 15.
